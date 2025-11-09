@@ -1,0 +1,121 @@
+table Clientes{
+  id_cliente int [increment, primary key]
+  nome varchar[100] [not null]
+  cpf var[11] [not null, unique]
+  email varchar[100] 
+  telefone varchar[20]
+  endereco varchar[200]
+  data_cadastro date
+}
+
+table Celular{
+  id_celular int [increment, primary key]
+  id_cliente int [ref:> Clientes.id_cliente]
+  marca varchar[50]
+  modelo varchar[50]
+  imei varchar[20] [unique]
+  valor decimal[10,2]
+  data_aquisição date
+}
+
+table Plano{
+  id_plano int [increment, primary key]
+  nome_plano varchar[50] [not null]
+  cobertura text
+  valor_mensal decimal[10,2]
+  franquia decimal[10,2]
+}
+
+table Funcionario{
+  id_funcionario int [increment, primary key]
+  nome varchar[100] [not null]
+  cpf char[11] [not null,unique]
+  cargo varchar[50]
+  email varchar[100] [not null, unique]
+  senha_hash varchar[255]
+}
+
+table Seguro{
+  id_seguro int [increment,primary key]
+  id_celular int [ref:> Celular.id_celular]
+  id_plano int [ref:> Plano.id_plano]
+  id_funcionario int [ref:> Funcionario.id_funcionario]
+  data_inicio date [not null]
+  data_fim date
+  status status.seguro [default:'ativo']
+}
+
+ enum status.seguro{
+  ativo
+  inativo
+  cancelado
+
+}
+
+table Pagamento{
+  id_pagamento int [increment, primary key]
+  id_seguro int [ref:> Seguro.id_seguro]
+  data_pagamento date
+  valor_pago decimal[10,2]
+  metodo_pagamento metodo_pagamento.Pagamento
+  status_pagamento status_pagamento.Pagamento [default: 'Pendente']
+
+}
+
+enum metodo_pagamento.Pagamento{
+  Cartão
+  PIX
+  Boleto
+}
+enum status_pagamento.Pagamento{
+  Pago
+  Pendente
+  Atrasado
+}
+
+table Sinitro{
+  id_sinistro int [increment, primary key]
+  id_seguro int [ref:> Seguro.id_seguro]
+  data_ocorrencia date [not null]
+  tipo tipo.Sinistro 
+  descricao text
+  status status_sinistro.Sinitro [default: 'Análise']
+
+}
+
+enum status_sinistro.Sinistro{
+  Análise
+  Aprovado
+  Negado
+  Finalizado    
+}
+
+enum tipo.Sinistro{
+  Roubo
+  Furto
+  Quebra
+  Outros
+}
+
+Table Atendimento{
+  id_atendimento int [increment, primary key]
+  id_cliente int [ref:> Clientes.id_cliente]
+  id_funcionario int [ref:> Funcionario.id_funcionario]
+  data_atendimento date
+  tipo tipo.Atendimento
+  descricao text
+  resolvido bool [default:'false']
+}
+
+enum tipo.Atendimento{
+  Sinistro
+  Suporte
+  Financeiro
+  Outros
+}
+
+
+
+
+
+
