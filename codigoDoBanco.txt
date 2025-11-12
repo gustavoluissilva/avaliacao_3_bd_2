@@ -139,3 +139,268 @@ CREATE TABLE atendimento (
         ON DELETE SET NULL
         ON UPDATE CASCADE
 );
+
+
+USE teste;
+
+DROP TABLE IF EXISTS atendimento;
+DROP TABLE IF EXISTS sinistro;
+DROP TABLE IF EXISTS pagamento;
+DROP TABLE IF EXISTS seguro;
+DROP TABLE IF EXISTS funcionario;
+DROP TABLE IF EXISTS plano;
+DROP TABLE IF EXISTS celular;
+DROP TABLE IF EXISTS cliente;
+
+-- ==========================================================
+-- 1. TABELA CLIENTE
+-- ==========================================================
+CREATE TABLE cliente (
+    id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    cpf CHAR(11) NOT NULL UNIQUE,
+    email VARCHAR(100),
+    telefone VARCHAR(20),
+    endereco VARCHAR(200),
+    data_cadastro DATE
+);
+
+-- ==========================================================
+-- 2. TABELA CELULAR
+-- ==========================================================
+CREATE TABLE celular (
+    id_celular INT AUTO_INCREMENT PRIMARY KEY,
+    id_cliente INT NOT NULL,
+    marca VARCHAR(50),
+    modelo VARCHAR(50),
+    imei VARCHAR(20) UNIQUE,
+    valor DECIMAL(10,2),
+    data_aquisicao DATE,
+    CONSTRAINT fk_celular_cliente FOREIGN KEY (id_cliente)
+        REFERENCES cliente (id_cliente)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+-- ==========================================================
+-- 3. TABELA PLANO
+-- ==========================================================
+CREATE TABLE plano (
+    id_plano INT AUTO_INCREMENT PRIMARY KEY,
+    nome_plano VARCHAR(50) NOT NULL,
+    cobertura TEXT,
+    valor_mensal DECIMAL(10,2),
+    franquia DECIMAL(10,2)
+);
+
+-- ==========================================================
+-- 4. TABELA FUNCIONARIO
+-- ==========================================================
+CREATE TABLE funcionario (
+    id_funcionario INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    cpf CHAR(11) UNIQUE,
+    cargo VARCHAR(50),
+    email VARCHAR(100),
+    senha_hash VARCHAR(255)
+);
+
+-- ==========================================================
+-- 5. TABELA SEGURO (corrigida)
+-- ==========================================================
+CREATE TABLE seguro (
+    id_seguro INT AUTO_INCREMENT PRIMARY KEY,
+    id_celular INT NOT NULL,
+    id_plano INT NOT NULL,
+    id_funcionario INT, 
+    data_inicio DATE NOT NULL,
+    data_fim DATE,
+    status ENUM('ativo','inativo','cancelado') DEFAULT 'ativo',
+    CONSTRAINT fk_seguro_celular FOREIGN KEY (id_celular)
+        REFERENCES celular (id_celular)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_seguro_plano FOREIGN KEY (id_plano)
+        REFERENCES plano (id_plano)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_seguro_funcionario FOREIGN KEY (id_funcionario)
+        REFERENCES funcionario (id_funcionario)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
+);
+
+-- ==========================================================
+-- 6. TABELA PAGAMENTO
+-- ==========================================================
+CREATE TABLE pagamento (
+    id_pagamento INT AUTO_INCREMENT PRIMARY KEY,
+    id_seguro INT NOT NULL,
+    data_pagamento DATE,
+    valor_pago DECIMAL(10,2),
+    metodo_pagamento ENUM('cartão','pix','boleto'),
+    status_pagamento ENUM('pago','pendente','atrasado') DEFAULT 'pendente',
+    CONSTRAINT fk_pagamento_seguro FOREIGN KEY (id_seguro)
+        REFERENCES seguro (id_seguro)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+-- ==========================================================
+-- 7. TABELA SINISTRO
+-- ==========================================================
+CREATE TABLE sinistro (
+    id_sinistro INT AUTO_INCREMENT PRIMARY KEY,
+    id_seguro INT NOT NULL,
+    data_ocorrencia DATE NOT NULL,
+    tipo ENUM('roubo','furto','quebra','outros'),
+    descricao TEXT,
+    status ENUM('em análise','aprovado','negado','finalizado') DEFAULT 'em análise',
+    CONSTRAINT fk_sinistro_seguro FOREIGN KEY (id_seguro)
+        REFERENCES seguro (id_seguro)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+-- ==========================================================
+-- 8. TABELA ATENDIMENTO
+-- ==========================================================
+CREATE TABLE atendimento (
+    id_atendimento INT AUTO_INCREMENT PRIMARY KEY,
+    id_cliente INT NOT NULL,
+    id_funcionario INT, 
+    data_atendimento DATETIME,
+    tipo ENUM('sinistro','suporte','financeiro','outros'),
+    descricao TEXT,
+    resolvido BOOLEAN DEFAULT FALSE,
+    CONSTRAINT fk_atendimento_cliente FOREIGN KEY (id_cliente)
+        REFERENCES cliente (id_cliente)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_atendimento_funcionario FOREIGN KEY (id_funcionario)
+        REFERENCES funcionario (id_funcionario)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
+);
+
+USE teste;
+
+-- ================================================
+-- 1. CLIENTE
+-- ================================================
+INSERT INTO cliente (nome, cpf, email, telefone, endereco, data_cadastro) VALUES
+('João Silva', '11111111111', 'joao@email.com', '11999990001', 'Rua das Flores, 123', '2024-01-15'),
+('Maria Oliveira', '22222222222', 'maria@email.com', '11999990002', 'Av. Brasil, 200', '2024-02-10'),
+('Carlos Pereira', '33333333333', 'carlos@email.com', '11999990003', 'Rua Central, 300', '2024-03-05'),
+('Ana Souza', '44444444444', 'ana@email.com', '11999990004', 'Travessa das Árvores, 45', '2024-04-12'),
+('Lucas Almeida', '55555555555', 'lucas@email.com', '11999990005', 'Rua Azul, 56', '2024-05-20'),
+('Fernanda Lima', '66666666666', 'fernanda@email.com', '11999990006', 'Av. das Palmeiras, 70', '2024-06-18'),
+('Rafael Costa', '77777777777', 'rafael@email.com', '11999990007', 'Rua do Sol, 12', '2024-07-11'),
+('Juliana Rocha', '88888888888', 'juliana@email.com', '11999990008', 'Rua Nova, 89', '2024-08-01'),
+('Pedro Gomes', '99999999999', 'pedro@email.com', '11999990009', 'Av. Paulista, 900', '2024-09-09'),
+('Mariana Torres', '00000000000', 'mariana@email.com', '11999990010', 'Rua das Rosas, 33', '2024-10-10');
+
+-- ================================================
+-- 2. CELULAR
+-- ================================================
+INSERT INTO celular (id_cliente, marca, modelo, imei, valor, data_aquisicao) VALUES
+(1, 'Samsung', 'Galaxy S21', 'IMEI0001', 3500.00, '2024-01-10'),
+(2, 'Apple', 'iPhone 13', 'IMEI0002', 5500.00, '2024-02-01'),
+(3, 'Xiaomi', 'Redmi Note 12', 'IMEI0003', 1800.00, '2024-03-03'),
+(4, 'Motorola', 'Edge 30', 'IMEI0004', 2500.00, '2024-04-15'),
+(5, 'Samsung', 'A54', 'IMEI0005', 2000.00, '2024-05-01'),
+(6, 'Apple', 'iPhone 12', 'IMEI0006', 4500.00, '2024-06-22'),
+(7, 'Xiaomi', 'Mi 11', 'IMEI0007', 3000.00, '2024-07-10'),
+(8, 'Motorola', 'Moto G100', 'IMEI0008', 1900.00, '2024-08-08'),
+(9, 'Samsung', 'Z Flip 4', 'IMEI0009', 6000.00, '2024-09-05'),
+(10, 'Apple', 'iPhone 14', 'IMEI0010', 7000.00, '2024-10-02');
+
+-- ================================================
+-- 3. PLANO
+-- ================================================
+INSERT INTO plano (nome_plano, cobertura, valor_mensal, franquia) VALUES
+('Básico', 'Cobertura contra quebra acidental', 29.90, 300.00),
+('Intermediário', 'Quebra e roubo', 49.90, 200.00),
+('Premium', 'Quebra, roubo e furto', 69.90, 100.00),
+('Platinum', 'Todas as coberturas + assistência 24h', 89.90, 50.00),
+('Econômico', 'Cobertura mínima', 19.90, 500.00),
+('Roubo Total', 'Apenas roubo qualificado', 39.90, 400.00),
+('Furto Simples', 'Apenas furto', 34.90, 400.00),
+('Proteção Total', 'Todas as coberturas', 99.90, 0.00),
+('Empresarial', 'Cobertura corporativa', 79.90, 200.00),
+('Estudante', 'Plano com desconto estudantil', 24.90, 300.00);
+
+-- ================================================
+-- 4. FUNCIONARIO
+-- ================================================
+INSERT INTO funcionario (nome, cpf, cargo, email, senha_hash) VALUES
+('João Batista', '10101010101', 'Atendente', 'joaob@seguro.com', 'hash1'),
+('Carla Mendes', '20202020202', 'Analista de Sinistro', 'carla@seguro.com', 'hash2'),
+('Ricardo Lima', '30303030303', 'Gerente', 'ricardo@seguro.com', 'hash3'),
+('Tatiane Freitas', '40404040404', 'Vendedora', 'tatiane@seguro.com', 'hash4'),
+('Felipe Rocha', '50505050505', 'Atendente', 'felipe@seguro.com', 'hash5'),
+('Paula Souza', '60606060606', 'Financeiro', 'paula@seguro.com', 'hash6'),
+('André Ribeiro', '70707070707', 'Analista de Dados', 'andre@seguro.com', 'hash7'),
+('Juliana Alves', '80808080808', 'Atendente', 'juliana@seguro.com', 'hash8'),
+('Pedro Martins', '90909090909', 'Supervisor', 'pedro@seguro.com', 'hash9'),
+('Lucas Lima', '11122233344', 'Suporte', 'lucas@seguro.com', 'hash10');
+
+-- ================================================
+-- 5. SEGURO
+-- ================================================
+INSERT INTO seguro (id_celular, id_plano, id_funcionario, data_inicio, data_fim, status) VALUES
+(1, 1, 1, '2024-01-20', NULL, 'ativo'),
+(2, 2, 2, '2024-02-20', NULL, 'ativo'),
+(3, 3, 3, '2024-03-20', NULL, 'ativo'),
+(4, 4, 4, '2024-04-20', NULL, 'ativo'),
+(5, 5, 5, '2024-05-20', NULL, 'ativo'),
+(6, 6, 6, '2024-06-20', NULL, 'ativo'),
+(7, 7, 7, '2024-07-20', NULL, 'ativo'),
+(8, 8, 8, '2024-08-20', NULL, 'ativo'),
+(9, 9, 9, '2024-09-20', NULL, 'ativo'),
+(10, 10, 10, '2024-10-20', NULL, 'ativo');
+
+-- ================================================
+-- 6. PAGAMENTO
+-- ================================================
+INSERT INTO pagamento (id_seguro, data_pagamento, valor_pago, metodo_pagamento, status_pagamento) VALUES
+(1, '2024-02-10', 29.90, 'pix', 'pago'),
+(2, '2024-03-10', 49.90, 'cartão', 'pago'),
+(3, '2024-04-10', 69.90, 'boleto', 'pago'),
+(4, '2024-05-10', 89.90, 'pix', 'pago'),
+(5, '2024-06-10', 19.90, 'cartão', 'pago'),
+(6, '2024-07-10', 39.90, 'pix', 'pago'),
+(7, '2024-08-10', 34.90, 'boleto', 'pendente'),
+(8, '2024-09-10', 99.90, 'pix', 'pago'),
+(9, '2024-10-10', 79.90, 'cartão', 'pago'),
+(10, '2024-11-10', 24.90, 'pix', 'pendente');
+
+-- ================================================
+-- 7. SINISTRO
+-- ================================================
+INSERT INTO sinistro (id_seguro, data_ocorrencia, tipo, descricao, status) VALUES
+(1, '2024-03-15', 'quebra', 'Tela quebrada após queda', 'aprovado'),
+(2, '2024-04-10', 'roubo', 'Celular roubado no metrô', 'finalizado'),
+(3, '2024-05-05', 'furto', 'Celular desapareceu no evento', 'negado'),
+(4, '2024-06-12', 'outros', 'Dano por líquido', 'em análise'),
+(5, '2024-07-03', 'quebra', 'Carcaça danificada', 'aprovado'),
+(6, '2024-08-01', 'roubo', 'Roubo à mão armada', 'aprovado'),
+(7, '2024-09-02', 'furto', 'Sumiu no transporte público', 'em análise'),
+(8, '2024-09-20', 'quebra', 'Tela e câmera danificadas', 'finalizado'),
+(9, '2024-10-11', 'outros', 'Problema elétrico', 'negado'),
+(10, '2024-10-30', 'roubo', 'Furto durante viagem', 'em análise');
+
+-- ================================================
+-- 8. ATENDIMENTO
+-- ================================================
+INSERT INTO atendimento (id_cliente, id_funcionario, data_atendimento, tipo, descricao, resolvido) VALUES
+(1, 1, '2024-03-01 10:00:00', 'sinistro', 'Cliente relatou quebra de tela', TRUE),
+(2, 2, '2024-04-01 11:00:00', 'financeiro', 'Dúvida sobre boleto', TRUE),
+(3, 3, '2024-05-01 09:30:00', 'suporte', 'Problemas no aplicativo', TRUE),
+(4, 4, '2024-06-01 14:20:00', 'sinistro', 'Cliente relatou roubo', TRUE),
+(5, 5, '2024-07-01 15:00:00', 'financeiro', 'Pedido de segunda via', TRUE),
+(6, 6, '2024-08-01 16:30:00', 'outros', 'Elogio ao atendimento', TRUE),
+(7, 7, '2024-09-01 17:00:00', 'suporte', 'Erro de login', FALSE),
+(8, 8, '2024-09-10 10:15:00', 'sinistro', 'Cliente com dúvida sobre indenização', FALSE),
+(9, 9, '2024-10-01 13:10:00', 'outros', 'Sugestão de melhoria', TRUE),
+(10, 10, '2024-11-01 09:45:00', 'financeiro', 'Dificuldade em pagar via PIX', FALSE);
