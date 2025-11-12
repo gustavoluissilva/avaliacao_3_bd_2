@@ -1,3 +1,17 @@
+USE teste;
+
+DROP TABLE IF EXISTS atendimento;
+DROP TABLE IF EXISTS sinistro;
+DROP TABLE IF EXISTS pagamento;
+DROP TABLE IF EXISTS seguro;
+DROP TABLE IF EXISTS funcionario;
+DROP TABLE IF EXISTS plano;
+DROP TABLE IF EXISTS celular;
+DROP TABLE IF EXISTS cliente;
+
+-- ==========================================================
+-- 1. TABELA CLIENTE
+-- ==========================================================
 CREATE TABLE cliente (
     id_cliente INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
@@ -5,7 +19,7 @@ CREATE TABLE cliente (
     email VARCHAR(100),
     telefone VARCHAR(20),
     endereco VARCHAR(200),
-    data_cadastro DATE DEFAULT
+    data_cadastro DATE
 );
 
 -- ==========================================================
@@ -49,13 +63,13 @@ CREATE TABLE funcionario (
 );
 
 -- ==========================================================
--- 5. TABELA SEGURO
+-- 5. TABELA SEGURO (corrigida)
 -- ==========================================================
 CREATE TABLE seguro (
     id_seguro INT AUTO_INCREMENT PRIMARY KEY,
     id_celular INT NOT NULL,
     id_plano INT NOT NULL,
-    id_funcionario INT NOT NULL,
+    id_funcionario INT,
     data_inicio DATE NOT NULL,
     data_fim DATE,
     status ENUM('ativo','inativo','cancelado') DEFAULT 'ativo',
@@ -111,8 +125,8 @@ CREATE TABLE sinistro (
 CREATE TABLE atendimento (
     id_atendimento INT AUTO_INCREMENT PRIMARY KEY,
     id_cliente INT NOT NULL,
-    id_funcionario INT NOT NULL,
-    data_atendimento DATETIME DEFAULT,
+    id_funcionario INT,
+    data_atendimento DATETIME,
     tipo ENUM('sinistro','suporte','financeiro','outros'),
     descricao TEXT,
     resolvido BOOLEAN DEFAULT FALSE,
