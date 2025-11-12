@@ -1,0 +1,127 @@
+CREATE TABLE cliente (
+    id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    cpf CHAR(11) NOT NULL UNIQUE,
+    email VARCHAR(100),
+    telefone VARCHAR(20),
+    endereco VARCHAR(200),
+    data_cadastro DATE DEFAULT
+);
+
+-- ==========================================================
+-- 2. TABELA CELULAR
+-- ==========================================================
+CREATE TABLE celular (
+    id_celular INT AUTO_INCREMENT PRIMARY KEY,
+    id_cliente INT NOT NULL,
+    marca VARCHAR(50),
+    modelo VARCHAR(50),
+    imei VARCHAR(20) UNIQUE,
+    valor DECIMAL(10,2),
+    data_aquisicao DATE,
+    CONSTRAINT fk_celular_cliente FOREIGN KEY (id_cliente)
+        REFERENCES cliente (id_cliente)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+-- ==========================================================
+-- 3. TABELA PLANO
+-- ==========================================================
+CREATE TABLE plano (
+    id_plano INT AUTO_INCREMENT PRIMARY KEY,
+    nome_plano VARCHAR(50) NOT NULL,
+    cobertura TEXT,
+    valor_mensal DECIMAL(10,2),
+    franquia DECIMAL(10,2)
+);
+
+-- ==========================================================
+-- 4. TABELA FUNCIONARIO
+-- ==========================================================
+CREATE TABLE funcionario (
+    id_funcionario INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    cpf CHAR(11) UNIQUE,
+    cargo VARCHAR(50),
+    email VARCHAR(100),
+    senha_hash VARCHAR(255)
+);
+
+-- ==========================================================
+-- 5. TABELA SEGURO
+-- ==========================================================
+CREATE TABLE seguro (
+    id_seguro INT AUTO_INCREMENT PRIMARY KEY,
+    id_celular INT NOT NULL,
+    id_plano INT NOT NULL,
+    id_funcionario INT NOT NULL,
+    data_inicio DATE NOT NULL,
+    data_fim DATE,
+    status ENUM('ativo','inativo','cancelado') DEFAULT 'ativo',
+    CONSTRAINT fk_seguro_celular FOREIGN KEY (id_celular)
+        REFERENCES celular (id_celular)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_seguro_plano FOREIGN KEY (id_plano)
+        REFERENCES plano (id_plano)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_seguro_funcionario FOREIGN KEY (id_funcionario)
+        REFERENCES funcionario (id_funcionario)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
+);
+
+-- ==========================================================
+-- 6. TABELA PAGAMENTO
+-- ==========================================================
+CREATE TABLE pagamento (
+    id_pagamento INT AUTO_INCREMENT PRIMARY KEY,
+    id_seguro INT NOT NULL,
+    data_pagamento DATE,
+    valor_pago DECIMAL(10,2),
+    metodo_pagamento ENUM('cartão','pix','boleto'),
+    status_pagamento ENUM('pago','pendente','atrasado') DEFAULT 'pendente',
+    CONSTRAINT fk_pagamento_seguro FOREIGN KEY (id_seguro)
+        REFERENCES seguro (id_seguro)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+-- ==========================================================
+-- 7. TABELA SINISTRO
+-- ==========================================================
+CREATE TABLE sinistro (
+    id_sinistro INT AUTO_INCREMENT PRIMARY KEY,
+    id_seguro INT NOT NULL,
+    data_ocorrencia DATE NOT NULL,
+    tipo ENUM('roubo','furto','quebra','outros'),
+    descricao TEXT,
+    status ENUM('em análise','aprovado','negado','finalizado') DEFAULT 'em análise',
+    CONSTRAINT fk_sinistro_seguro FOREIGN KEY (id_seguro)
+        REFERENCES seguro (id_seguro)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+-- ==========================================================
+-- 8. TABELA ATENDIMENTO
+-- ==========================================================
+CREATE TABLE atendimento (
+    id_atendimento INT AUTO_INCREMENT PRIMARY KEY,
+    id_cliente INT NOT NULL,
+    id_funcionario INT NOT NULL,
+    data_atendimento DATETIME DEFAULT,
+    tipo ENUM('sinistro','suporte','financeiro','outros'),
+    descricao TEXT,
+    resolvido BOOLEAN DEFAULT FALSE,
+    CONSTRAINT fk_atendimento_cliente FOREIGN KEY (id_cliente)
+        REFERENCES cliente (id_cliente)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_atendimento_funcionario FOREIGN KEY (id_funcionario)
+        REFERENCES funcionario (id_funcionario)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
+);
