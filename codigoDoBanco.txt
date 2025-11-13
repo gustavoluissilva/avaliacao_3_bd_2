@@ -69,7 +69,7 @@ CREATE TABLE seguro (
     id_seguro INT AUTO_INCREMENT PRIMARY KEY,
     id_celular INT NOT NULL,
     id_plano INT NOT NULL,
-    id_funcionario INT, 
+    id_funcionario INT,
     data_inicio DATE NOT NULL,
     data_fim DATE,
     status ENUM('ativo','inativo','cancelado') DEFAULT 'ativo',
@@ -125,7 +125,7 @@ CREATE TABLE sinistro (
 CREATE TABLE atendimento (
     id_atendimento INT AUTO_INCREMENT PRIMARY KEY,
     id_cliente INT NOT NULL,
-    id_funcionario INT, 
+    id_funcionario INT,
     data_atendimento DATETIME,
     tipo ENUM('sinistro','suporte','financeiro','outros'),
     descricao TEXT,
