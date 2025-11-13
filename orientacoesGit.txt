@@ -1,0 +1,40 @@
+1. Instalar o git bash
+2. Criar uma pasta com um nome qualquer
+3.  Abrir pasta, botão direito e 'open git bash here' (cuidado para não clicar na open git GUI here), se não aparecer a opção, reiniciar o pc / verificar instalação 
+4. No git bash, cole os comandos:
+
+git clone https://github.com/gustavoluissilva/avaliacao_3_bd_2.git
+
+Deve retornar algo como:
+
+Cloning into 'avaliacao_3_bd_2'...
+remote: Enumerating objects: 8, done.
+remote: Counting objects: 100% (8/8), done.
+remote: Compressing objects: 100% (6/6), done.
+remote: Total 8 (delta 0), reused 5 (delta 0), pack-reused 0 (from 0)
+Receiving objects: 100% (8/8), 137.51 KiB | 2.59 MiB/s, done.
+
+Comando 2:
+
+cd avaliacao_3_bd_2
+
+Comando 3: 
+
+git remote -v
+
+Deve retornar:
+
+origin  https://github.com/gustavoluissilva/avaliacao_3_bd_2.git (fetch)
+origin  https://github.com/gustavoluissilva/avaliacao_3_bd_2.git (push)
+
+Comando 4: 
+
+git pull origin master
+
+Deve retornar: 
+
+Já está atualizado ao último ou vai trazer o que não foi feito 
+
+
+
+
