@@ -1,5 +1,8 @@
+CREATE DATABASE trabalho_banco2;
+
 USE teste;
 
+DROP DATABASE trabalho_banco2;
 DROP TABLE IF EXISTS atendimento;
 DROP TABLE IF EXISTS sinistro;
 DROP TABLE IF EXISTS pagamento;
@@ -85,7 +88,7 @@ CREATE TABLE seguro (
         REFERENCES funcionario (id_funcionario)
         ON DELETE SET NULL
         ON UPDATE CASCADE
-); 
+);
 
 -- ==========================================================
 -- 6. TABELA PAGAMENTO
@@ -155,7 +158,27 @@ INSERT INTO cliente (nome, cpf, email, telefone, endereco, data_cadastro) VALUES
 ('Rafael Costa', '77777777777', 'rafael@email.com', '11999990007', 'Rua do Sol, 12', '2024-07-11'),
 ('Juliana Rocha', '88888888888', 'juliana@email.com', '11999990008', 'Rua Nova, 89', '2024-08-01'),
 ('Pedro Gomes', '99999999999', 'pedro@email.com', '11999990009', 'Av. Paulista, 900', '2024-09-09'),
-('Mariana Torres', '00000000000', 'mariana@email.com', '11999990010', 'Rua das Rosas, 33', '2024-10-10');
+('Mariana Torres', '00000000000', 'mariana@email.com', '11999990010', 'Rua das Rosas, 33', '2024-10-10'),
+('Thiago Moreira', '12112112112', 'thiago@email.com', '11988880001', 'Rua Verde, 101', '2024-01-10'),
+('Beatriz Ramos', '23223223223', 'beatriz@email.com', '11988880002', 'Av. Central, 202', '2024-01-12'),
+('Hugo Andrade', '34334334334', 'hugo@email.com', '11988880003', 'Rua Norte, 303', '2024-01-15'),
+('Patrícia Lopes', '45445445445', 'patricia@email.com', '11988880004', 'Rua Sul, 404', '2024-01-18'),
+('Marcos Vinicius', '56556556556', 'marcos@email.com', '11988880005', 'Travessa 5, 55', '2024-01-20'),
+('Letícia Ramos', '67667667667', 'leticia@email.com', '11988880006', 'Rua Azul, 66', '2024-01-22'),
+('Gustavo Ferreira', '78778778778', 'gustavo@email.com', '11988880007', 'Rua 7, 777', '2024-01-25'),
+('Amanda Rocha', '89889889889', 'amanda@email.com', '11988880008', 'Av. Oeste, 888', '2024-01-28'),
+('Rodrigo Neves', '90990990990', 'rodrigo@email.com', '11988880009', 'Rua 9, 999', '2024-02-01'),
+('Camila Dias', '11211211299', 'camila@email.com', '11988880010', 'Rua A, 12', '2024-02-05'),
+('Fernando Reis', '22122122122', 'fernando@email.com', '11988880011', 'Rua B, 22', '2024-02-07'),
+('Bruna Martins', '33233233233', 'bruna@email.com', '11988880012', 'Rua C, 33', '2024-02-09'),
+('Eduardo Nogueira', '44344344344', 'eduardo@email.com', '11988880013', 'Rua D, 44', '2024-02-11'),
+('Renata Carvalho', '55455455455', 'renata@email.com', '11988880014', 'Rua E, 55', '2024-02-13'),
+('Daniel Gomes', '66566566566', 'daniel@email.com', '11988880015', 'Rua F, 66', '2024-02-15'),
+('Paula Fernandes', '77677677677', 'paula@email.com', '11988880016', 'Rua G, 77', '2024-02-17'),
+('Marcelo Souza', '88788788788', 'marcelo@email.com', '11988880017', 'Rua H, 88', '2024-02-19'),
+('Carolina Pires', '99899899899', 'carolina@email.com', '11988880018', 'Rua I, 99', '2024-02-21'),
+('Adriana Teixeira', '11133355577', 'adriana@email.com', '11988880019', 'Rua J, 111', '2024-02-23'),
+('Igor Santana', '22244466688', 'igor@email.com', '11988880020', 'Rua K, 222', '2024-02-25');
 
 -- ================================================
 -- 2. CELULAR
@@ -170,7 +193,27 @@ INSERT INTO celular (id_cliente, marca, modelo, imei, valor, data_aquisicao) VAL
 (7, 'Xiaomi', 'Mi 11', 'IMEI0007', 3000.00, '2024-07-10'),
 (8, 'Motorola', 'Moto G100', 'IMEI0008', 1900.00, '2024-08-08'),
 (9, 'Samsung', 'Z Flip 4', 'IMEI0009', 6000.00, '2024-09-05'),
-(10, 'Apple', 'iPhone 14', 'IMEI0010', 7000.00, '2024-10-02');
+(10, 'Apple', 'iPhone 14', 'IMEI0010', 7000.00, '2024-10-02'),
+(11,'Samsung','A34','IMEI1011',1800,'2024-01-10'),
+(12,'Apple','iPhone 11','IMEI1012',3000,'2024-01-12'),
+(13,'Xiaomi','Note 11','IMEI1013',1500,'2024-01-15'),
+(14,'Motorola','Moto G50','IMEI1014',1200,'2024-01-18'),
+(15,'Samsung','A14','IMEI1015',900,'2024-01-20'),
+(16,'Apple','iPhone XR','IMEI1016',2500,'2024-01-22'),
+(17,'Xiaomi','Mi 10','IMEI1017',2000,'2024-01-25'),
+(18,'Samsung','S22','IMEI1018',3500,'2024-01-28'),
+(19,'Motorola','Moto G200','IMEI1019',2300,'2024-02-01'),
+(20,'Apple','iPhone 12','IMEI1020',4200,'2024-02-05'),
+(21,'Samsung','A54','IMEI1021',2000,'2024-02-07'),
+(22,'Xiaomi','Poco X5','IMEI1022',1700,'2024-02-09'),
+(23,'Apple','iPhone 13','IMEI1023',5000,'2024-02-11'),
+(24,'Samsung','A23','IMEI1024',1300,'2024-02-13'),
+(25,'Xiaomi','Note 12','IMEI1025',1600,'2024-02-15'),
+(26,'Motorola','Moto E40','IMEI1026',900,'2024-02-17'),
+(27,'Samsung','S21','IMEI1027',3000,'2024-02-19'),
+(28,'Xiaomi','Redmi 9','IMEI1028',800,'2024-02-21'),
+(29,'Apple','iPhone 14','IMEI1029',7000,'2024-02-23'),
+(30,'Samsung','A04','IMEI1030',700,'2024-02-25');
 
 -- ================================================
 -- 3. PLANO
@@ -215,7 +258,28 @@ INSERT INTO seguro (id_celular, id_plano, id_funcionario, data_inicio, data_fim,
 (7, 7, 7, '2024-07-20', NULL, 'ativo'),
 (8, 8, 8, '2024-08-20', NULL, 'ativo'),
 (9, 9, 9, '2024-09-20', NULL, 'ativo'),
-(10, 10, 10, '2024-10-20', NULL, 'ativo');
+(10, 10, 10, '2024-10-20', NULL, 'ativo'),
+(11,1,1,'2024-02-01',NULL,'ativo'),
+(12,2,2,'2024-02-02',NULL,'ativo'),
+(13,3,3,'2024-02-03',NULL,'ativo'),
+(14,4,4,'2024-02-04',NULL,'ativo'),
+(15,5,5,'2024-02-05',NULL,'ativo'),
+(16,6,6,'2024-02-06','2024-08-01','inativo'),
+(17,7,7,'2024-02-07','2024-07-20','cancelado'),
+(18,8,8,'2024-02-08','2024-09-10','inativo'),
+(19,9,9,'2024-02-09','2024-06-30','cancelado'),
+(20,10,10,'2024-02-10','2024-05-15','inativo'),
+(21,1,1,'2024-02-11',NULL,'ativo'),
+(22,2,2,'2024-02-12',NULL,'ativo'),
+(23,3,3,'2024-02-13','2024-09-01','inativo'),
+(24,4,4,'2024-02-14','2024-10-10','cancelado'),
+(25,5,5,'2024-02-15',NULL,'ativo'),
+(26,6,6,'2024-02-16','2024-09-25','inativo'),
+(27,7,7,'2024-02-17','2024-11-05','cancelado'),
+(28,8,8,'2024-02-18',NULL,'ativo'),
+(29,9,9,'2024-02-19','2024-12-12','inativo'),
+(30,10,10,'2024-02-20','2024-11-30','cancelado');
+
 
 -- ================================================
 -- 6. PAGAMENTO
@@ -230,7 +294,27 @@ INSERT INTO pagamento (id_seguro, data_pagamento, valor_pago, metodo_pagamento, 
 (7, '2024-08-10', 34.90, 'boleto', 'pendente'),
 (8, '2024-09-10', 99.90, 'pix', 'pago'),
 (9, '2024-10-10', 79.90, 'cartão', 'pago'),
-(10, '2024-11-10', 24.90, 'pix', 'pendente');
+(10, '2024-11-10', 24.90, 'pix', 'pendente'),
+(11,'2024-03-05',29.90,'pix','pago'),
+(12,'2024-03-06',49.90,'cartão','pago'),
+(13,'2024-03-07',69.90,'pix','pendente'),
+(14,'2024-03-08',89.90,'boleto','pago'),
+(15,'2024-03-09',19.90,'pix','pago'),
+(16,'2024-03-10',39.90,'cartão','pago'),
+(17,'2024-03-11',34.90,'boleto','pendente'),
+(18,'2024-03-12',99.90,'pix','pago'),
+(19,'2024-03-13',79.90,'cartão','pago'),
+(20,'2024-03-14',24.90,'pix','pendente'),
+(21,'2024-03-15',29.90,'pix','pago'),
+(22,'2024-03-16',49.90,'cartão','pendente'),
+(23,'2024-03-17',69.90,'pix','pago'),
+(24,'2024-03-18',89.90,'cartão','pago'),
+(25,'2024-03-19',19.90,'boleto','pago'),
+(26,'2024-03-20',39.90,'pix','pago'),
+(27,'2024-03-21',34.90,'cartão','pago'),
+(28,'2024-03-22',99.90,'pix','pendente'),
+(29,'2024-03-23',79.90,'boleto','pago'),
+(30,'2024-03-24',24.90,'cartão','pago');
 
 -- ================================================
 -- 7. SINISTRO
@@ -245,7 +329,28 @@ INSERT INTO sinistro (id_seguro, data_ocorrencia, tipo, descricao, status) VALUE
 (7, '2024-09-02', 'furto', 'Sumiu no transporte público', 'em análise'),
 (8, '2024-09-20', 'quebra', 'Tela e câmera danificadas', 'finalizado'),
 (9, '2024-10-11', 'outros', 'Problema elétrico', 'negado'),
-(10, '2024-10-30', 'roubo', 'Furto durante viagem', 'em análise');
+(10, '2024-10-30', 'roubo', 'Furto durante viagem', 'em análise'),
+(11,'2024-04-01','quebra','Tela danificada','aprovado'),
+(11,'2024-04-10','roubo','Roubado na rua','finalizado'),
+(11,'2024-04-20','quebra','Dano adicional','aprovado'),
+(12,'2024-04-02','furto','Furto em evento','negado'),
+(12,'2024-04-12','quebra','Queda acidental','aprovado'),
+(12,'2024-04-25','outros','Dano interno','em análise'),
+(13,'2024-04-03','quebra','Trinca na tela','aprovado'),
+(13,'2024-04-13','quebra','Nova queda','aprovado'),
+(13,'2024-04-23','outros','Curto elétrico','negado'),
+(14,'2024-04-04','roubo','Roubado no ônibus','finalizado'),
+(14,'2024-04-15','furto','Furto simples','negado'),
+(14,'2024-04-26','quebra','Dano físico','aprovado'),
+(15,'2024-04-05','quebra','Dano leve','aprovado'),
+(16,'2024-04-06','roubo','Roubo à mão armada','finalizado'),
+(17,'2024-04-07','furto','Furto no shopping','em análise'),
+(17,'2024-04-27','quebra','Dano na carcaça','aprovado'),
+(18,'2024-04-08','quebra','Display danificado','aprovado'),
+(19,'2024-04-09','outros','Falha elétrica','aprovado'),
+(20,'2024-04-10','quebra','Quebra leve','aprovado'),
+(21,'2024-04-11','roubo','Roubado em assalto','finalizado'),
+(22,'2024-04-12','furto','Furto no trabalho','em análise');
 
 -- ================================================
 -- 8. ATENDIMENTO
@@ -260,49 +365,200 @@ INSERT INTO atendimento (id_cliente, id_funcionario, data_atendimento, tipo, des
 (7, 7, '2024-09-01 17:00:00', 'suporte', 'Erro de login', FALSE),
 (8, 8, '2024-09-10 10:15:00', 'sinistro', 'Cliente com dúvida sobre indenização', FALSE),
 (9, 9, '2024-10-01 13:10:00', 'outros', 'Sugestão de melhoria', TRUE),
-(10, 10, '2024-11-01 09:45:00', 'financeiro', 'Dificuldade em pagar via PIX', FALSE);
+(10, 10, '2024-11-01 09:45:00', 'financeiro', 'Dificuldade em pagar via PIX', FALSE),
+(11,1,'2024-04-01 10:00:00','sinistro','Relato de quebra',TRUE),
+(12,2,'2024-04-02 11:00:00','sinistro','Relato de furto',TRUE),
+(13,3,'2024-04-03 09:00:00','sinistro','Relato de dano',TRUE),
+(14,4,'2024-04-04 14:00:00','sinistro','Relato de roubo',TRUE),
+(15,5,'2024-04-05 15:00:00','financeiro','Consulta de cobrança',TRUE),
+(16,6,'2024-04-06 16:00:00','outros','Elogio ao suporte',TRUE),
+(17,7,'2024-04-07 17:00:00','suporte','Erro no app',FALSE),
+(18,8,'2024-04-08 10:00:00','sinistro','Dúvidas gerais',FALSE),
+(19,9,'2024-04-09 11:00:00','outros','Sugestão',TRUE),
+(20,10,'2024-04-10 12:00:00','financeiro','Dificuldade no pagamento',FALSE);
 
 
--- TRIGGER PEDIDA 
-DELIMITER //
-CREATE TRIGGER trg_pagamentos_atualiza_seguro
-AFTER UPDATE ON pagamento 
-FOR EACH ROW
+-- ================================================
+-- Função: total pago em um seguro
+-- ================================================
+CREATE FUNCTION trabalho_banco2.total_pago_seguro(p_id_seguro INT)
+RETURNS DECIMAL(10,2)
+DETERMINISTIC
+READS SQL DATA
 BEGIN
-    IF NEW.status_pagamento = 'atrasado' AND OLD.status_pagamento <> 'atrasado' THEN
-        UPDATE seguro 
-        SET status = 'inativo'
-        WHERE id_seguro = NEW.id_seguro
-        AND status = 'ativo'; 
+    DECLARE total DECIMAL(10,2);
+
+    SELECT COALESCE(SUM(valor_pago), 0)
+    INTO total
+    FROM pagamento
+    WHERE id_seguro = p_id_seguro
+      AND status_pagamento = 'pago';
+
+    RETURN total;
+END;
+
+-- ================================================
+-- Select para rodar função total_pago_seguro
+-- ================================================
+SELECT total_pago_seguro(1) as total_pago; 
+
+-- ================================================
+-- Listar todos os seguros com o total pago
+-- ================================================
+SELECT 
+    s.id_seguro,
+    c.modelo,
+    trabalho_banco2.total_pago_seguro(s.id_seguro) AS total_pago
+FROM seguro s
+JOIN celular c ON c.id_celular = s.id_celular;
+
+-- ================================================
+-- Relatorio financeiro
+-- ================================================
+SELECT 
+    s.id_seguro,
+    s.data_inicio,
+    p.valor_mensal,
+    trabalho_banco2.total_pago_seguro(s.id_seguro) AS valor_recebido
+FROM seguro s
+JOIN plano p ON p.id_plano = s.id_plano;
+
+-- ================================================
+-- Função: total de sinistros de um cliente
+-- ================================================
+CREATE FUNCTION trabalho_banco2.total_sinistros_cliente(p_id_cliente INT)
+RETURNS INT
+DETERMINISTIC
+READS SQL DATA
+BEGIN
+    DECLARE total INT;
+
+    SELECT COUNT(*)
+    INTO total
+    FROM sinistro s
+    JOIN seguro se ON s.id_seguro = se.id_seguro
+    JOIN celular c ON se.id_celular = c.id_celular
+    WHERE c.id_cliente = p_id_cliente;
+
+    RETURN COALESCE(total, 0);
+END;
+
+-- ================================================
+-- Select para rodar função total_sinistros_cliente
+-- ================================================
+SELECT total_sinistros_cliente(2) as sinistros; 
+
+-- ================================================
+-- Listar clientes com quantidade de sinistros
+-- ================================================
+SELECT 
+    c.id_cliente,
+    c.nome,
+    trabalho_banco2.total_sinistros_cliente(c.id_cliente) AS total_sinistros
+FROM cliente c
+ORDER BY total_sinistros DESC;
+
+-- ================================================
+-- Relatorio area de risco
+-- ================================================
+SELECT 
+    c.id_cliente,
+    c.nome,
+    COUNT(DISTINCT se.id_seguro) AS total_seguros,
+    trabalho_banco2.total_sinistros_cliente(c.id_cliente) AS total_sinistros,
+    
+    CASE 
+        WHEN trabalho_banco2.total_sinistros_cliente(c.id_cliente) >= 3 
+             THEN 'ALTO RISCO'
+        WHEN trabalho_banco2.total_sinistros_cliente(c.id_cliente) = 0 
+             THEN 'NENHUM RISCO'
+        ELSE 'RISCO NORMAL'
+    END AS classificacao
+
+FROM cliente c
+LEFT JOIN celular ce ON ce.id_cliente = c.id_cliente
+LEFT JOIN seguro se ON se.id_celular = ce.id_celular
+
+GROUP BY c.id_cliente, c.nome
+ORDER BY total_sinistros DESC;
+
+-- ================================================
+-- Função: dias para expirar o seguro
+-- ================================================
+CREATE FUNCTION buscar_plano_por_seguro(p_id_seguro INT)
+RETURNS VARCHAR(100)
+DETERMINISTIC
+BEGIN
+    DECLARE nome_plano VARCHAR(100);
+
+    SELECT pl.nome_plano
+    INTO nome_plano
+    FROM seguro s
+    JOIN plano pl ON pl.id_plano = s.id_plano
+    WHERE s.id_seguro = p_id_seguro
+    LIMIT 1;
+
+    IF nome_plano IS NULL THEN
+        SET nome_plano = 'NÃO ENCONTRADO';
     END IF;
-END; 
 
-//
-DELIMITER ;
+    RETURN nome_plano;
+END;
 
--- Se um pagamento passa do status 'pago' ou 'pendente' para 'atrasado', o status da apólice de seguro relacionada 
--- deve ser alterado de 'ativo' para 'inativo'.
-/*
-use teste;
+-- ================================================
+-- Select para rodar função dias_para_expirar
+-- ================================================
+SELECT buscar_plano_por_seguro(2); 
 
-SELECT * FROM pagamento;
+-- ================================================
+-- Relatorio geral de seguros exibindo o nome do plano
+-- ================================================
+SELECT 
+    s.id_seguro,
+    c.modelo AS celular,
+    buscar_plano_por_seguro(s.id_seguro) AS plano
+FROM seguro s
+JOIN celular c ON c.id_celular = s.id_celular;
 
-UPDATE pagamento
-SET 
-    status_pagamento = 'atrasado'
-WHERE id_pagamento = 10;
+-- ================================================
+-- Analise de seguros por tipo de plano
+-- ================================================
+SELECT 
+    buscar_plano_por_seguro(s.id_seguro) AS plano,
+    COUNT(*) AS quantidade
+FROM seguro s
+GROUP BY plano
+ORDER BY quantidade DESC;
 
-select * from pagamento; 
+-- ================================================
+-- Procedure: RELATÓRIO DE PERFORMANCE DOS SEGUROS
+-- ================================================
+CREATE PROCEDURE relatorio_performance_seguros()
+BEGIN
+    SELECT 
+        s.id_seguro,
+        c.id_cliente,
+        c.nome AS cliente,
+        ce.marca AS celular_marca,
+        ce.modelo AS celular_modelo,
+        buscar_plano_por_seguro(s.id_seguro) AS plano,
+        trabalho_banco2.total_pago_seguro(s.id_seguro) AS total_pago,
+        trabalho_banco2.total_sinistros_cliente(c.id_cliente) AS total_sinistros_cliente,
+        CASE
+            WHEN trabalho_banco2.total_sinistros_cliente(c.id_cliente) >= 3 THEN 'ALTO RISCO'
+            WHEN trabalho_banco2.total_sinistros_cliente(c.id_cliente) = 0 THEN 'NENHUM RISCO'
+            ELSE 'RISCO NORMAL'
+        END AS classificacao_risco,
+        s.status AS status_seguro,
+        s.data_inicio,
+        s.data_fim
+    FROM seguro s
+    JOIN celular ce ON ce.id_celular = s.id_celular
+    JOIN cliente c ON c.id_cliente = ce.id_cliente
+    ORDER BY classificacao_risco DESC, total_pago DESC;
+END;
 
-SELECT
-    p.id_pagamento,
-    p.id_seguro,
-    p.status_pagamento,
-    s.status AS status_seguro
-FROM
-    pagamento p
-JOIN
-    seguro s ON p.id_seguro = s.id_seguro
-WHERE 
-	p.id_pagamento = 10;
-    */
+-- ================================================
+-- Visualizar relatorio
+-- ================================================
+CALL relatorio_performance_seguros();
