@@ -381,6 +381,8 @@ INSERT INTO atendimento (id_cliente, id_funcionario, data_atendimento, tipo, des
 -- ================================================
 -- Função: total pago em um seguro
 -- ================================================
+DELIMITER $$
+
 CREATE FUNCTION trabalho_banco2.total_pago_seguro(p_id_seguro INT)
 RETURNS DECIMAL(10,2)
 DETERMINISTIC
@@ -395,7 +397,9 @@ BEGIN
       AND status_pagamento = 'pago';
 
     RETURN total;
-END;
+END $$
+
+DELIMITER ;
 
 -- ================================================
 -- Select para rodar função total_pago_seguro
@@ -426,6 +430,8 @@ JOIN plano p ON p.id_plano = s.id_plano;
 -- ================================================
 -- Função: total de sinistros de um cliente
 -- ================================================
+DELIMITER $$
+
 CREATE FUNCTION trabalho_banco2.total_sinistros_cliente(p_id_cliente INT)
 RETURNS INT
 DETERMINISTIC
@@ -441,7 +447,9 @@ BEGIN
     WHERE c.id_cliente = p_id_cliente;
 
     RETURN COALESCE(total, 0);
-END;
+END $$
+
+DELIMITER ;
 
 -- ================================================
 -- Select para rodar função total_sinistros_cliente
@@ -485,9 +493,12 @@ ORDER BY total_sinistros DESC;
 -- ================================================
 -- Função: Busca plano por seguro
 -- ================================================
+DELIMITER $$
+
 CREATE FUNCTION buscar_plano_por_seguro(p_id_seguro INT)
 RETURNS VARCHAR(100)
 DETERMINISTIC
+READS SQL DATA
 BEGIN
     DECLARE nome_plano VARCHAR(100);
 
@@ -503,7 +514,9 @@ BEGIN
     END IF;
 
     RETURN nome_plano;
-END;
+END $$
+
+DELIMITER ;
 
 -- ================================================
 -- Select para rodar função buscar_plano_por_seguro
@@ -533,6 +546,8 @@ ORDER BY quantidade DESC;
 -- ================================================
 -- Procedure: RELATÓRIO DE PERFORMANCE DOS SEGUROS
 -- ================================================
+DELIMITER $$
+
 CREATE PROCEDURE relatorio_performance_seguros()
 BEGIN
     SELECT 
@@ -556,7 +571,9 @@ BEGIN
     JOIN celular ce ON ce.id_celular = s.id_celular
     JOIN cliente c ON c.id_cliente = ce.id_cliente
     ORDER BY classificacao_risco DESC, total_pago DESC;
-END;
+END $$
+
+DELIMITER ;
 
 -- ================================================
 -- Visualizar relatorio
@@ -568,17 +585,23 @@ CALL relatorio_performance_seguros();
 -- TRIGGER PEDIDA
 -- ================================================
 DELIMITER //
+
 CREATE TRIGGER trg_pagamentos_atualiza_seguro
-AFTER UPDATE ON pagamento 
+AFTER UPDATE ON pagamento
 FOR EACH ROW
-IF NEW.status_pagamento = 'atrasado' AND OLD.status_pagamento <> 'atrasado' THEN
-        UPDATE seguro 
+BEGIN
+    -- Se o pagamento mudou para 'atrasado'
+    IF NEW.status_pagamento = 'atrasado'
+       AND OLD.status_pagamento <> 'atrasado' THEN
+        
+        -- Atualiza o seguro para 'inativo'
+        UPDATE seguro
         SET status = 'inativo'
         WHERE id_seguro = NEW.id_seguro
-        AND status = 'ativo'; 
-END; 
+          AND status = 'ativo';
+    END IF;
+END //
 
-//
 DELIMITER ;
 
 -- Se um pagamento passa do status 'pago' ou 'pendente' para 'atrasado', o status da apólice de seguro relacionada 
