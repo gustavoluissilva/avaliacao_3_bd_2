@@ -85,7 +85,7 @@ CREATE TABLE seguro (
         REFERENCES funcionario (id_funcionario)
         ON DELETE SET NULL
         ON UPDATE CASCADE
-);
+); 
 
 -- ==========================================================
 -- 6. TABELA PAGAMENTO
@@ -261,3 +261,48 @@ INSERT INTO atendimento (id_cliente, id_funcionario, data_atendimento, tipo, des
 (8, 8, '2024-09-10 10:15:00', 'sinistro', 'Cliente com dúvida sobre indenização', FALSE),
 (9, 9, '2024-10-01 13:10:00', 'outros', 'Sugestão de melhoria', TRUE),
 (10, 10, '2024-11-01 09:45:00', 'financeiro', 'Dificuldade em pagar via PIX', FALSE);
+
+
+-- TRIGGER PEDIDA 
+DELIMITER //
+CREATE TRIGGER trg_pagamentos_atualiza_seguro
+AFTER UPDATE ON pagamento 
+FOR EACH ROW
+BEGIN
+    IF NEW.status_pagamento = 'atrasado' AND OLD.status_pagamento <> 'atrasado' THEN
+        UPDATE seguro 
+        SET status = 'inativo'
+        WHERE id_seguro = NEW.id_seguro
+        AND status = 'ativo'; 
+    END IF;
+END; 
+
+//
+DELIMITER ;
+
+-- Se um pagamento passa do status 'pago' ou 'pendente' para 'atrasado', o status da apólice de seguro relacionada 
+-- deve ser alterado de 'ativo' para 'inativo'.
+/*
+use teste;
+
+SELECT * FROM pagamento;
+
+UPDATE pagamento
+SET 
+    status_pagamento = 'atrasado'
+WHERE id_pagamento = 10;
+
+select * from pagamento; 
+
+SELECT
+    p.id_pagamento,
+    p.id_seguro,
+    p.status_pagamento,
+    s.status AS status_seguro
+FROM
+    pagamento p
+JOIN
+    seguro s ON p.id_seguro = s.id_seguro
+WHERE 
+	p.id_pagamento = 10;
+    */
