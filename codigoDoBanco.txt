@@ -483,7 +483,7 @@ GROUP BY c.id_cliente, c.nome
 ORDER BY total_sinistros DESC;
 
 -- ================================================
--- Função: dias para expirar o seguro
+-- Função: Busca plano por seguro
 -- ================================================
 CREATE FUNCTION buscar_plano_por_seguro(p_id_seguro INT)
 RETURNS VARCHAR(100)
@@ -506,7 +506,7 @@ BEGIN
 END;
 
 -- ================================================
--- Select para rodar função dias_para_expirar
+-- Select para rodar função buscar_plano_por_seguro
 -- ================================================
 SELECT buscar_plano_por_seguro(2); 
 
@@ -562,3 +562,48 @@ END;
 -- Visualizar relatorio
 -- ================================================
 CALL relatorio_performance_seguros();
+
+
+-- ================================================
+-- TRIGGER PEDIDA
+-- ================================================
+DELIMITER //
+CREATE TRIGGER trg_pagamentos_atualiza_seguro
+AFTER UPDATE ON pagamento 
+FOR EACH ROW
+IF NEW.status_pagamento = 'atrasado' AND OLD.status_pagamento <> 'atrasado' THEN
+        UPDATE seguro 
+        SET status = 'inativo'
+        WHERE id_seguro = NEW.id_seguro
+        AND status = 'ativo'; 
+END; 
+
+//
+DELIMITER ;
+
+-- Se um pagamento passa do status 'pago' ou 'pendente' para 'atrasado', o status da apólice de seguro relacionada 
+-- deve ser alterado de 'ativo' para 'inativo'.
+/*
+use teste;
+
+SELECT * FROM pagamento;
+
+UPDATE pagamento
+SET 
+    status_pagamento = 'atrasado'
+WHERE id_pagamento = 10;
+
+select * from pagamento; 
+
+SELECT
+    p.id_pagamento,
+    p.id_seguro,
+    p.status_pagamento,
+    s.status AS status_seguro
+FROM
+    pagamento p
+JOIN
+    seguro s ON p.id_seguro = s.id_seguro
+WHERE 
+	p.id_pagamento = 10;
+    */
