@@ -1,0 +1,244 @@
+-- Se um pagamento passa do status 'pago' ou 'pendente' para 'atrasado', o status da apólice de seguro relacionada 
+-- deve ser alterado de 'ativo' para 'inativo'.
+/*
+use teste;
+
+SELECT * FROM pagamento;
+
+UPDATE pagamento
+SET 
+    status_pagamento = 'atrasado'
+WHERE id_pagamento = 10;
+
+select * from pagamento; 
+
+SELECT
+    p.id_pagamento,
+    p.id_seguro,
+    p.status_pagamento,
+    s.status AS status_seguro
+FROM
+    pagamento p
+JOIN
+    seguro s ON p.id_seguro = s.id_seguro
+WHERE 
+	p.id_pagamento = 10;
+    */
+    
+    -- Usando CTE e JOIN
+    
+    use teste; 
+    
+    -- Consulta #1 - "Quais marcas e modelos de celular têm maior incidência de sinistros?"
+WITH sinistros_por_celular AS (
+    SELECT 
+        cel.marca,
+        cel.modelo,
+        COUNT(sin.id_sinistro) AS total_sinistros,
+        -- Subconsulta para contar apenas sinistros aprovados
+        (SELECT COUNT(*) 
+         FROM sinistro s2 
+         JOIN seguro se2 ON se2.id_seguro = s2.id_seguro
+         WHERE se2.id_celular = cel.id_celular 
+           AND s2.status IN ('aprovado', 'finalizado')
+        ) AS sinistros_aprovados,
+        AVG(cel.valor) AS valor_medio
+    FROM celular cel
+    JOIN seguro seg ON seg.id_celular = cel.id_celular
+    JOIN sinistro sin ON sin.id_seguro = seg.id_seguro
+    GROUP BY cel.id_celular, cel.marca, cel.modelo
+    HAVING COUNT(sin.id_sinistro) > 0
+)
+SELECT 
+    marca,
+    modelo,
+    total_sinistros,
+    sinistros_aprovados,
+    valor_medio,
+    -- Função de janela para ranking
+    RANK() OVER (ORDER BY total_sinistros DESC) AS ranking_incidencia,
+    -- Cálculo de taxa de aprovação
+    ROUND((sinistros_aprovados * 100.0 / total_sinistros), 2) AS taxa_aprovacao_percentual
+FROM sinistros_por_celular
+ORDER BY total_sinistros DESC
+LIMIT 10;
+
+#consulta - 2 Quais clientes têm pagamentos em atraso e qual o valor devido?
+
+-- Usando JOIN múltiplo e função agregada
+SELECT 
+    c.id_cliente,
+    c.nome,
+    c.telefone,
+    c.email,
+    COUNT(p.id_pagamento) AS total_pagamentos_atrasados,
+    SUM(p.valor_pago) AS valor_total_atrasado,
+    -- Subconsulta para última data de pagamento
+    (SELECT MAX(data_pagamento) 
+     FROM pagamento p2 
+     JOIN seguro s2 ON s2.id_seguro = p2.id_seguro
+     JOIN celular cel2 ON cel2.id_celular = s2.id_celular
+     WHERE cel2.id_cliente = c.id_cliente 
+       AND p2.status_pagamento = 'pago'
+    ) AS ultimo_pagamento,
+    -- Dias desde o último pagamento
+    DATEDIFF(CURDATE(), 
+        (SELECT MAX(data_pagamento) 
+         FROM pagamento p2 
+         JOIN seguro s2 ON s2.id_seguro = p2.id_seguro
+         JOIN celular cel2 ON cel2.id_celular = s2.id_celular
+         WHERE cel2.id_cliente = c.id_cliente 
+           AND p2.status_pagamento = 'pago'
+        )
+    ) AS dias_sem_pagamento
+FROM cliente c
+JOIN celular cel ON cel.id_cliente = c.id_cliente
+JOIN seguro s ON s.id_celular = cel.id_celular
+JOIN pagamento p ON p.id_seguro = s.id_seguro
+WHERE p.status_pagamento = 'atrasado'
+GROUP BY c.id_cliente, c.nome, c.telefone, c.email
+HAVING COUNT(p.id_pagamento) > 0
+ORDER BY valor_total_atrasado DESC;
+
+# Consulta 3 - "Qual plano é mais escolhido para cada faixa de valor de celular?"
+
+-- Usando CTE e funções de janela
+WITH planos_por_faixa AS (
+    SELECT 
+        CASE 
+            WHEN cel.valor < 1000 THEN 'Econômico (até R$ 1.000)'
+            WHEN cel.valor BETWEEN 1000 AND 2500 THEN 'Intermediário (R$ 1.000-2.500)'
+            WHEN cel.valor BETWEEN 2501 AND 4000 THEN 'Premium (R$ 2.501-4.000)'
+            ELSE 'Luxo (acima de R$ 4.000)'
+        END AS faixa_valor,
+        pl.nome_plano,
+        COUNT(s.id_seguro) AS total_seguros,
+        AVG(cel.valor) AS valor_medio_celular,
+        SUM(pl.valor_mensal) AS receita_mensal_total
+    FROM seguro s
+    JOIN celular cel ON cel.id_celular = s.id_celular
+    JOIN plano pl ON pl.id_plano = s.id_plano
+    WHERE s.status = 'ativo'
+    GROUP BY faixa_valor, pl.nome_plano
+)
+SELECT 
+    faixa_valor,
+    nome_plano,
+    total_seguros,
+    ROUND(valor_medio_celular, 2) AS valor_medio_celular,
+    ROUND(receita_mensal_total, 2) AS receita_mensal_total,
+    -- Função de janela para rank dentro de cada faixa
+    RANK() OVER (PARTITION BY faixa_valor ORDER BY total_seguros DESC) AS ranking_plano_faixa,
+    -- Percentual do total na faixa
+    ROUND((total_seguros * 100.0 / SUM(total_seguros) OVER (PARTITION BY faixa_valor)), 2) AS percentual_faixa
+FROM planos_por_faixa
+ORDER BY 
+    CASE faixa_valor
+        WHEN 'Econômico (até R$ 1.000)' THEN 1
+        WHEN 'Intermediário (R$ 1.000-2.500)' THEN 2
+        WHEN 'Premium (R$ 2.501-4.000)' THEN 3
+        ELSE 4
+    END,
+    total_seguros DESC;
+    
+    #consulta 4 - "Quais funcionários venderam mais seguros no último mês?"
+    
+    -- Usando JOIN, funções de data e subconsulta
+SELECT 
+    f.id_funcionario,
+    f.nome,
+    f.cargo,
+    COUNT(s.id_seguro) AS seguros_vendidos_mes,
+    -- Subconsulta para total histórico
+    (SELECT COUNT(*) 
+     FROM seguro s2 
+     WHERE s2.id_funcionario = f.id_funcionario
+    ) AS total_seguros_vendidos,
+    -- Valor total dos celulares segurados
+    SUM(cel.valor) AS valor_total_segurado,
+    -- Receita mensal estimada
+    SUM(pl.valor_mensal) AS receita_mensal_estimada,
+    -- Média do valor dos celulares vendidos
+    ROUND(AVG(cel.valor), 2) AS valor_medio_celular
+FROM funcionario f
+JOIN seguro s ON s.id_funcionario = f.id_funcionario
+JOIN celular cel ON cel.id_celular = s.id_celular
+JOIN plano pl ON pl.id_plano = s.id_plano
+WHERE MONTH(s.data_inicio) = MONTH(CURRENT_DATE() - INTERVAL 1 MONTH)
+  AND YEAR(s.data_inicio) = YEAR(CURRENT_DATE() - INTERVAL 1 MONTH)
+  AND s.status = 'ativo'
+GROUP BY f.id_funcionario, f.nome, f.cargo
+ORDER BY seguros_vendidos_mes DESC
+LIMIT 5;
+
+#consulta 5 - Como está a distribuição e resolução dos atendimentos por tipo?
+WITH atendimentos_analise AS (
+    SELECT 
+        a.tipo,
+        COUNT(a.id_atendimento) AS total_atendimentos,
+        SUM(CASE WHEN a.resolvido = TRUE THEN 1 ELSE 0 END) AS atendimentos_resolvidos,
+        -- Subconsulta para tempo médio de resolução (em horas)
+        (SELECT AVG(TIMESTAMPDIFF(HOUR, a2.data_atendimento, 
+            (SELECT MIN(data_atendimento) 
+             FROM atendimento a3 
+             WHERE a3.id_cliente = a2.id_cliente 
+               AND a3.resolvido = TRUE 
+               AND a3.data_atendimento > a2.data_atendimento)
+            ))
+         FROM atendimento a2 
+         WHERE a2.tipo = a.tipo 
+           AND a2.resolvido = TRUE
+        ) AS tempo_medio_resolucao_horas,
+        -- Contagem por funcionário
+        COUNT(DISTINCT a.id_funcionario) AS funcionarios_envolvidos
+    FROM atendimento a
+    WHERE a.data_atendimento >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+    GROUP BY a.tipo
+)
+SELECT 
+    tipo,
+    total_atendimentos,
+    atendimentos_resolvidos,
+    -- Taxa de resolução
+    ROUND((atendimentos_resolvidos * 100.0 / total_atendimentos), 2) AS taxa_resolucao_percentual,
+    tempo_medio_resolucao_horas,
+    funcionarios_envolvidos,
+    -- Função de janela para percentual do total
+    ROUND((total_atendimentos * 100.0 / SUM(total_atendimentos) OVER ()), 2) AS percentual_total
+FROM atendimentos_analise
+ORDER BY total_atendimentos DESC;
+
+#consulta 6 - Quais clientes tiveram mais de um sinistro e qual o custo estimado?"
+-- Usando múltiplos JOINs e HAVING
+SELECT 
+    c.id_cliente,
+    c.nome,
+    c.cpf,
+    COUNT(DISTINCT sin.id_sinistro) AS total_sinistros,
+    -- Contagem de sinistros aprovados
+    COUNT(DISTINCT CASE 
+        WHEN sin.status IN ('aprovado', 'finalizado') 
+        THEN sin.id_sinistro 
+    END) AS sinistros_aprovados,
+    -- Valor total segurado
+    SUM(cel.valor) AS valor_total_segurado,
+    -- Custo estimado (valor do celular - franquia)
+    ROUND(SUM(
+        CASE 
+            WHEN sin.status IN ('aprovado', 'finalizado') 
+            THEN cel.valor - pl.franquia 
+            ELSE 0 
+        END
+    ), 2) AS custo_total_estimado,
+    -- Último sinistro
+    MAX(sin.data_ocorrencia) AS ultimo_sinistro,
+    -- Dias desde o último sinistro
+    DATEDIFF(CURDATE(), MAX(sin.data_ocorrencia)) AS dias_desde_ultimo_sinistro
+FROM cliente c
+JOIN celular cel ON cel.id_cliente = c.id_cliente
+JOIN seguro s ON s.id_celular = cel.id_celular
+JOIN sinistro sin ON sin.id_seguro = s.id_seguro
+JOIN plano pl ON pl.id_plano = s.id_plano
+GROUP BY c.id_cliente, c.nome, c.cpf
+HAVING COUNT(DISTINCT sin.id_sinistro) > 1
+ORDER BY total_sinistros DESC, custo_total_estimado DESC;
