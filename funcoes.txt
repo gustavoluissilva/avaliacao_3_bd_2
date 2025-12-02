@@ -203,6 +203,8 @@ DELIMITER ;
 CALL relatorio_performance_seguros();
 
 
+-- DADOS TRIGGER começa a partir daqui: 
+
 -- ================================================
 -- TRIGGER PEDIDA
 -- ================================================
